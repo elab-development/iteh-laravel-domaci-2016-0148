@@ -12,10 +12,19 @@ class OpeningController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $openings = Opening::all();
-        return response()->json($openings);
+        $query = Opening::query();
+        if ($request->has('employment_type')) {
+            $query->where('employment_type', $request->employment_type);
+        }
+        if ($request->has('work_mode')) {
+            $query->where('work_mode', $request->work_mode);
+        }
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+        return response()->json($query->get(), 200);
     }
     /**
      * Show the form for creating a new resource.
