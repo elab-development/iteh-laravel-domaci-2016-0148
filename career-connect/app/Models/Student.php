@@ -9,6 +9,10 @@ class Student extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id', 'faculty', 'study_program', 'graduation_year', 'phone_number', 'address'
+    ];
+
     // Relations
 
     public function user()
