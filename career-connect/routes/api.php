@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,14 +14,26 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
-Route::post('/register/student', [StudentController::class, 'register']);
-Route::post('/register/company', [CompanyController::class, 'register']);
-
+Route::post('/register/student', [
+    StudentController::class,
+    'register'
+]);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/student/openings', [StudentController::class, 'index']);
-    Route::post('/student/openings/{id}/apply', [StudentController::class, 'apply']);
-    Route::delete('/student/profile', [StudentController::class, 'destroy']);
+    Route::get('/student/openings', [
+        StudentController::class,
+        'index'
+    ]);
+    Route::post(
+        '/student/openings/{id}/apply',
+        [StudentController::class, 'apply']
+    );
+    Route::delete('/student/profile', [
+        StudentController::class,
+        'destroy'
+    ]);
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('openings', OpeningController::class)->except(['edit', 'create']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
