@@ -9,6 +9,13 @@ class Company extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'description',
+        'website',
+        'location',
+    ];
+
     // Relations
     public function user()
     {
