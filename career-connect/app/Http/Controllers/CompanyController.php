@@ -62,15 +62,37 @@ class CompanyController extends Controller
     }
 
     // Brisanje profila kompanije
-    public function destroy()
+    public function destroy($companyId = null)
     {
-        $company = $this->ensureCompany();
-        if ($company instanceof \Illuminate\Http\JsonResponse) return $company;
+        $user = Auth::user();
 
-        $user = $company->user;
-        $company->delete();
-        $user->delete();
+        // Ako je kompanija, briše svoj nalog
+        if ($user->company && is_null($companyId)) {
+            $company = $this->ensureCompany();
+            if ($company instanceof \Illuminate\Http\JsonResponse)
+                return $company;
 
-        return response()->json(['message' => 'Company profile deleted successfully.']);
+            $user = $company->user;
+            $company->delete();
+            $user->delete();
+
+            return response()->json(['message' => 'Company profile deleted successfully.']);
+        }
+
+        // Ako je admin, omogućava mu da obriše bilo koju kompaniju po ID-ju
+        if ($user->admin && !is_null($companyId)) {
+            $company = Company::find($companyId);
+            if (!$company) {
+                return response()->json(['error' => 'Company not found.'], 404);
+            }
+
+            $user = $company->user;
+            $company->delete();
+            $user->delete();
+
+            return response()->json(['message' => 'Company profile deleted successfully by admin.']);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 }

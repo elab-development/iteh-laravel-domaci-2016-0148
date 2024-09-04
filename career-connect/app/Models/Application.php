@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Application extends Model
 {
     use HasFactory;
-    
-    protected $fillable = ['student_id', 'opening_id'];
-    
+
+    protected $fillable = ['status', 'student_id', 'opening_id'];
+
     // Relations
 
     public function opening()

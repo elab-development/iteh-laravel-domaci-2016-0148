@@ -62,16 +62,6 @@ class StudentController extends Controller
         return $student;
     }
 
-    // Prikaz svih oglasa
-    public function index()
-    {
-        $student = $this->ensureStudent();
-        if ($student instanceof \Illuminate\Http\JsonResponse) return $student;
-
-        $openings = Opening::all();
-        return response()->json($openings);
-    }
-
     // Prijava na oglas
     public function apply(Request $request, $id)
     {
@@ -94,15 +84,36 @@ class StudentController extends Controller
 
 
     // Brisanje naloga
-    public function destroy()
+    public function destroy($studentId = null)
 {
-    $student = $this->ensureStudent();
-    if ($student instanceof \Illuminate\Http\JsonResponse) return $student;
+    $user = Auth::user();
 
-    $user = $student->user;
-    $student->delete();
-    $user->delete();
+    // Ako je student, briše svoj nalog
+    if ($user->student && is_null($studentId)) {
+        $student = $this->ensureStudent();
+        if ($student instanceof \Illuminate\Http\JsonResponse) return $student;
 
-    return response()->json(['message' => 'Profile deleted successfully.']);
+        $user = $student->user;
+        $student->delete();
+        $user->delete();
+
+        return response()->json(['message' => 'Profile deleted successfully.']);
+    }
+
+    // Ako je admin, omogućava mu da obriše bilo kog studenta po ID-ju
+    if ($user->admin && !is_null($studentId)) {
+        $student = Student::find($studentId);
+        if (!$student) {
+            return response()->json(['error' => 'Student not found.'], 404);
+        }
+
+        $user = $student->user;
+        $student->delete();
+        $user->delete();
+
+        return response()->json(['message' => 'Student profile deleted successfully by admin.']);
+    }
+
+    return response()->json(['error' => 'Unauthorized'], 403);
 }
 }

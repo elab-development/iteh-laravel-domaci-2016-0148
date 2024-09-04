@@ -52,8 +52,10 @@ in:office,hybrid,remote',
         }
         $company = Auth::user()->company;
         if (!$company) {
-            return response()->json(['error' => 'Only companies
-can create openings.'], 403);
+            return response()->json([
+                'error' => 'Only companies
+can create openings.'
+            ], 403);
         }
         $opening = Opening::create([
             'company_id' => $company->id,
@@ -115,15 +117,39 @@ in:office,hybrid,remote',
     public function destroy(string $id)
     {
         $opening = Opening::findOrFail($id);
-        $company = Auth::user()->company;
+        $user = Auth::user();
+
+        // Provera da li je admin
+        if ($user->admin) {
+            $opening->delete();
+            return response()->json(['message' => 'Opening deleted successfully by admin.']);
+        }
+
+        // Provera da li je ulogovana kompanija vlasnik oglasa
+        $company = $user->company;
         if (!$company || $opening->company_id != $company->id) {
             return response()->json(
                 ['error' => 'Unauthorized.'],
                 403
             );
         }
+
+        // Brisanje oglasa ako je ulogovana kompanija vlasnik
         $opening->delete();
-        return response()->json(['message' => 'Opening deleted
-successfully.']);
+        return response()->json(['message' => 'Opening deleted successfully.']);
+    }
+
+    // Openings of current logged in company
+    public function companyOpenings()
+    {
+        $company = Auth::user()->company;
+
+        if (!$company) {
+            return response()->json(['error' => 'Only companies can view their own openings.'], 403);
+        }
+
+        $openings = Opening::where('company_id', $company->id)->get();
+
+        return response()->json($openings, 200);
     }
 }
