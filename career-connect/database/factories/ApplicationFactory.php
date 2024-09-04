@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Opening;
+use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,15 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'opening_id' => Opening::factory(),
+            'student_id' => Student::factory(),
+            'status' => $this->faker->randomElement([
+                'applied',
+                'interviewing',
+                'accepted',
+                'rejected'
+            ]),
+            'applied_at' => now(),
         ];
     }
 }
