@@ -42,9 +42,8 @@ class OpeningController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string',
-            'employment_type' => 'required|string|in:fulltime,part-time,internship',
-            'work_mode' => 'required|string|
-in:office,hybrid,remote',
+            'employment_type' => 'required|string|in:full-time,part-time,internship',
+            'work_mode' => 'required|string|in:office,hybrid,remote',
             'expires_at' => 'nullable|date',
         ]);
         if ($validator->fails()) {
@@ -53,8 +52,7 @@ in:office,hybrid,remote',
         $company = Auth::user()->company;
         if (!$company) {
             return response()->json([
-                'error' => 'Only companies
-can create openings.'
+                'error' => 'Only companies can create openings.'
             ], 403);
         }
         $opening = Opening::create([
@@ -101,8 +99,7 @@ can create openings.'
             'description' => 'sometimes|string',
             'location' => 'sometimes|string',
             'employment_type' => 'sometimes|string|in:fulltime,part-time,internship',
-            'work_mode' => 'sometimes|string|
-in:office,hybrid,remote',
+            'work_mode' => 'sometimes|string|in:office,hybrid,remote',
             'expires_at' => 'nullable|date',
         ]);
         if ($validator->fails()) {
